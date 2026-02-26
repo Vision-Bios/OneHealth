@@ -38,57 +38,86 @@ struct VoiceEntryView: View {
         NavigationStack {
             ZStack {
                 HealthArtBackground()
-                VStack(alignment: .leading, spacing: 16) {
+                VStack(spacing: 16) {
                     HeaderView(title: "Voice Entry", subtitle: kind.title)
 
                     Text(kind.helper)
                         .font(.footnote)
                         .foregroundColor(.white.opacity(0.7))
+                        .padding(.horizontal, 20)
 
-                    TextEditor(text: $transcriber.transcript)
-                        .frame(minHeight: 160)
-                        .padding(12)
+                    VStack(spacing: 12) {
+                        HStack(spacing: 12) {
+                            Text("Transcribed text")
+                                .foregroundColor(.white.opacity(0.7))
+                            Spacer()
+                        }
+
+                        ZStack(alignment: .topLeading) {
+                            if transcriber.transcript.isEmpty {
+                                Text("Your voice entry will appear here...")
+                                    .foregroundColor(.white.opacity(0.45))
+                                    .padding(.top, 6)
+                            }
+
+                            TextEditor(text: $transcriber.transcript)
+                                .foregroundColor(.white)
+                                .tint(.white)
+                                .scrollContentBackground(.hidden)
+                                .frame(height: 120)
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 12)
+                        .frame(maxWidth: 320)
                         .background(
-                            RoundedRectangle(cornerRadius: 16)
-                                .fill(Color.white.opacity(0.10))
+                            RoundedRectangle(cornerRadius: 18)
+                                .fill(Color.white.opacity(0.12))
                                 .overlay(
-                                    RoundedRectangle(cornerRadius: 16)
+                                    RoundedRectangle(cornerRadius: 18)
                                         .stroke(Color.white.opacity(0.18), lineWidth: 1)
                                 )
                         )
-                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity, alignment: .center)
 
-                    HStack(spacing: 12) {
-                        Button {
-                            transcriber.toggleRecording()
-                        } label: {
-                            HStack(spacing: 8) {
-                                Image(systemName: transcriber.isRecording ? "stop.circle.fill" : "mic.circle.fill")
-                                Text(transcriber.isRecording ? "Stop" : "Record")
+                        HStack(spacing: 12) {
+                            Button {
+                                transcriber.toggleRecording()
+                            } label: {
+                                HStack(spacing: 8) {
+                                    Image(systemName: transcriber.isRecording ? "stop.circle.fill" : "mic.circle.fill")
+                                    Text(transcriber.isRecording ? "Stop" : "Record")
+                                }
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 12)
+                                .background(
+                                    Capsule()
+                                        .fill(transcriber.isRecording ? Color(red: 0.98, green: 0.47, blue: 0.47, opacity: 0.35) : Color.white.opacity(0.16))
+                                )
+                            }
+                            .buttonStyle(.plain)
+
+                            Button("Use Text") {
+                                let text = transcriber.transcript.trimmingCharacters(in: .whitespacesAndNewlines)
+                                guard text.isEmpty == false else { return }
+                                onComplete(text)
+                                dismiss()
                             }
                             .foregroundColor(.white)
                             .padding(.horizontal, 16)
-                            .padding(.vertical, 10)
-                            .background(Capsule().fill(Color.white.opacity(0.18)))
+                            .padding(.vertical, 12)
+                            .background(
+                                Capsule()
+                                    .fill(Color.white.opacity(0.24))
+                            )
+                            .buttonStyle(.plain)
                         }
-                        .buttonStyle(.plain)
-
-                        Button("Use Text") {
-                            let text = transcriber.transcript.trimmingCharacters(in: .whitespacesAndNewlines)
-                            guard text.isEmpty == false else { return }
-                            onComplete(text)
-                            dismiss()
-                        }
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 10)
-                        .background(Capsule().fill(Color.white.opacity(0.28)))
-                        .buttonStyle(.plain)
                     }
+                    .padding(.horizontal, 20)
 
                     Spacer()
                 }
-                .padding(20)
+                .padding(.top, 24)
             }
         }
         .onAppear {

@@ -102,7 +102,7 @@ struct VaccinesView: View {
                         name: draft.name,
                         date: draft.date ?? Date(),
                         region: viewModel.selectedRegion,
-                        provider: "",
+                        provider: draft.provider.isEmpty ? "Unknown provider" : draft.provider,
                         notes: draft.notes
                     )
                     viewModel.addRecord(record)
@@ -117,7 +117,7 @@ struct VaccinesView: View {
                     name: draft.name,
                     date: draft.date ?? Date(),
                     region: viewModel.selectedRegion,
-                    provider: "Unknown provider",
+                    provider: draft.provider.isEmpty ? "Unknown provider" : draft.provider,
                     notes: draft.notes
                 ),
                 defaultRegion: viewModel.selectedRegion
@@ -158,6 +158,11 @@ private struct VaccineOCRReviewView: View {
                             if let date = draft.date {
                                 Text(HealthDateFormatter.shortDate.string(from: date))
                                     .font(.subheadline)
+                            }
+                            if draft.provider.isEmpty == false {
+                                Text(draft.provider)
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
                             }
                             Text(draft.notes)
                                 .font(.caption)
